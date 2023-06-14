@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My Blog</title>
+        <meta name="description" content="A blog about technology and coding.">
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                font-size: 16px;
+                line-height: 1.5;
+                color: #333;
+                background-color: #f2f2f2;
+            }
+            header {
+                background-color: #fff;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                padding: 1rem;
+                margin-bottom: 2rem;
+            }
+            h1 {
+                margin: 0;
+                font-size: 2rem;
+            }
+            nav {
+                margin-top: 1rem;
+            }
+            ul {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                display: flex;
+            }
+            li {
+                margin-right: 1rem;
+            }
+            a {
+                text-decoration: none;
+                color: #333;
+                transition: color 0.2s;
+            }
+            a:hover {
+                color: #007bff;
+            }
+            main {
+                display: flex;
+                flex-direction: column;
+            }
+            article {
+                margin-bottom: 2rem;
+                background-color: #fff;
+                padding: 1rem;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            h2 {
+                margin: 0 0 1rem 0;
+            }
+            p {
+                margin: 0;
+            }
+            footer {
+                background-color: #f2f2f2;
+                padding: 1rem;
+                margin-top: 2rem;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>My Blog</h1>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            <article>
+                <h2>My First Post</h2>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla pellentesque lacinia elit at tincidunt. Maecenas malesuada magna sit amet odio laoreet, id bibendum lacus dapibus.</p>
+            </article>
+            <article>
+                <h2>My Second Post</h2>
+                <p>Phasellus ac ultrices enim, quis bibendum massa. Integer eu orci non justo venenatis pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Nam volutpat laoreet lectus ac blandit.</p>
+            </article>
+        </main>
+        <footer>
+            <p>&copy; 2023 My Blog. All rights reserved.</p>
+        </footer>
+        <script>
+            // Get the navigation links
+            const navLinks = document.querySelectorAll('nav a');
+
+            // Loop through each link
+            navLinks.forEach(link => {
+
+                // Check if the link points to the current page
+                if (link.href === window.location.href) {
+            
+                    // Add the "active" class to the link and its parent
+                    link.classList.add('active');
+                    link.parentNode.classList.add('active');
+                }
+            });
+
+            // Get the modal and its close button
+            const modal = document.getElementById('myModal');
+            const closeBtn = document.querySelector('.close');
+
+            // Open the modal when the user clicks the "Contact" button
+            document.getElementById('contactBtn').addEventListener('click', () => {
+                modal.style.display = 'block';
+            });
+
+            // Close the modal when the user clicks the close button or outside the modal
+            window.addEventListener('click', (event) => {
+                if (event.target === modal || event.target === closeBtn) {
+                modal.style.display = 'none';
+                }
+            });
+
+            // Get the form and its input fields
+            const form = document.querySelector('form');
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const messageInput = document.getElementById('message');
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Disable the submit button by default
+            submitBtn.disabled = true;
+
+            // Enable the submit button when all input fields have valid values
+            form.addEventListener('input', () => {
+                if (nameInput.value && emailInput.checkValidity() && messageInput.value) {
+                    submitBtn.disabled = false;
+                } else {
+                    submitBtn.disabled = true;
+                }
+            });
+
+            // Submit the form data using AJAX when the user clicks the submit button
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/submit-form');
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        alert('Form submitted successfully!');
+                    } else {
+                        alert('An error occurred while submitting the form.');
+                    }
+                };
+                xhr.send(JSON.stringify({
+                    name: nameInput.value,
+                    email: emailInput.value,
+                    message: messageInput.value
+                }));
+            });
+        </script>
+    </body>
+</html>
