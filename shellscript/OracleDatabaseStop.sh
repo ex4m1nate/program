@@ -8,10 +8,10 @@ STOP=`sqlplus -s / as sysdba << EOF
     shutdown immediate;
 EOF`
 
+DB_STATUS=$?
+
 echo $STOP
 
-
-DB_STATUS=$?
 
 if [ $DB_STATUS != 0  ]; then
     exit 2;

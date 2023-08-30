@@ -8,10 +8,10 @@ START=`sqlplus -s / as sysdba << EOF
     startup;
 EOF`
 
+DB_STATUS=$?
+
 echo $START
 
-
-DB_STATUS=$?
 
 if [ $DB_STATUS != 0  ]; then
     exit 2;
