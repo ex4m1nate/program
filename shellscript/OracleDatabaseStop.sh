@@ -5,6 +5,7 @@ STOP=`sqlplus -s / as sysdba << EOF
     set echo off;
     set flush off;
     set head off;
+    alter pluggable database pdb close immediate;
     shutdown immediate;
 EOF`
 

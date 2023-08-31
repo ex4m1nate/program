@@ -6,6 +6,7 @@ START=`sqlplus -s / as sysdba << EOF
     set flush off;
     set head off;
     startup;
+    alter pluggable database pdb open;
 EOF`
 
 DB_STATUS=$?
