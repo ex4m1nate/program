@@ -6,10 +6,10 @@ set flush off;
 set head on;
 alter session set container = pdb;
 col tablespace_name     format a15
-col "size_MB"           format 990.99
-col "used_MB"           format 990.99
-col "free_MB"           format 990.99
-col "rate"              format 990.99
+col size_MB           format 990.99
+col used_MB           format 990.99
+col free_MB           format 990.99
+col rate              format 990.99
 select
     tablespace_name,
     nvl(total_bytes / 1024 / 1024, 0) as size_MB,
