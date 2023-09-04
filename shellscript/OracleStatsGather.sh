@@ -1,32 +1,28 @@
 #!/bin/sh
 
-SCHEMAS="FUM FMM FML OFAC1"
-
 SQL="set feedback off;
 set echo off;
 set flush off;
 set head off;
 alter session set container = pdb;
-begin
-    for schema_name in $SCHEMAS loop
-        dbms_stats.gather_schema_stats(
-            ownname => schema_name, 
-            estimate_percent => dbms_stats.auto_sample_size, 
-            cascade => true, 
-            method_opt => 'FOR ALL COLUMNS SIZE AUTO', 
-            degree => dbms_stats.default_degree);
-    end loop;
-end;
-/"
+whenever sqlerror exit 2;
+exec dbms_stats.gather_schema_stats(ownname => 'FUM', estimate_percent => dbm
+s_stats.auto_sample_size);
+exec dbms_stats.gather_schema_stats(ownname => 'FMM', estimate_percent => dbm
+s_stats.auto_sample_size);
+exec dbms_stats.gather_schema_stats(ownname => 'FML', estimate_percent => dbm
+s_stats.auto_sample_size);
+exec dbms_stats.gather_schema_stats(ownname => 'OFAC1', estimate_percent =>db
+ms_stats.auto_sample_size);
+exit
+"
 
 sqlplus -s / as sysdba << EOF
     $SQL
 EOF
 
-DB_STATUS=$?
-
-if [ $DB_STATUS != 0  ]; then
-    echo "Statistics gathering could not be completed."
+if [ $? != 0  ]; then
+    echo "Error: Statistics gathering could not be completed."
     exit 2;
 fi
 

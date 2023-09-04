@@ -7,15 +7,14 @@ do
     set echo off;
     set flush off;
     set head off;
+    whenever sqlerror exit 2;
     alter index $fum_index_name rebuild;
     exit;
 EOF
 
 done < index_fum.lst
 
-DB_STATUS=$?
-
-if [ $DB_STATUS != 0  ]; then
+if [ $? != 0  ]; then
     echo "Indexes could not be altered."
     exit 2;
 fi
@@ -28,15 +27,14 @@ do
     set echo off;
     set flush off;
     set head off;
+    whenever sqlerror exit 2;
     alter index $fmm_index_name rebuild;
     exit;
 EOF
 
 done < index_fmm.lst
 
-DB_STATUS=$?
-
-if [ $DB_STATUS != 0  ]; then
+if [ $? != 0  ]; then
     echo "Indexes could not be altered."
     exit 2;
 fi
@@ -49,15 +47,14 @@ do
     set echo off;
     set flush off;
     set head off;
+    whenever sqlerror exit 2;
     alter index $fml_index_name rebuild;
     exit;
 EOF
 
 done < index_fml.lst
 
-DB_STATUS=$?
-
-if [ $DB_STATUS != 0  ]; then
+if [ $? != 0  ]; then
     echo "Indexes could not be altered."
     exit 2;
 fi
@@ -70,15 +67,14 @@ do
     set echo off;
     set flush off;
     set head off;
+    whenever sqlerror exit 2;
     alter index $ofac1_index_name rebuild;
     exit;
 EOF
 
 done < index_ofac1.lst
 
-DB_STATUS=$?
-
-if [ $DB_STATUS != 0  ]; then
+if [ $? != 0  ]; then
     echo "Indexes could not be altered."
     exit 2;
 fi

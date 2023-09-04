@@ -5,6 +5,7 @@ START=`sqlplus -s / as sysdba << EOF
     set echo off;
     set flush off;
     set head off;
+    whenever sqlerror exit 2;
     startup;
     alter pluggable database pdb open;
 EOF`

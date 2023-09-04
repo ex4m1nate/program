@@ -5,6 +5,7 @@ set echo off;
 set flush off;
 set head on;
 alter session set container = pdb;
+whenever sqlerror exit 2;
 col tablespace_name     format a15
 col size_MB           format 990.99
 col used_MB           format 990.99
@@ -40,9 +41,7 @@ RESULT=`sqlplus -s / as sysdba << EOF
     $SQL
 EOF`
 
-DB_STATUS=$?
-
-if [ $DB_STATUS != 0  ]; then
+if [ $? != 0  ]; then
     exit 2;
 fi
 
