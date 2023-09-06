@@ -20,8 +20,7 @@ do
 EOF
 
 if [ $? != 0  ]; then
-    echo "Error: Indexes could not be altered.\n\nFor more infomation,
-please see the following log:\n$logfile"
+    echo "Error: Indexes could not be altered.\n\n$(cat $logfile | grep -e ORA- -e SP2- )\n\nFor more infomation, please see the following log:\n$logfile"
     exit 2;
 fi
 

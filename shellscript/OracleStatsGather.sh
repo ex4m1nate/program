@@ -27,12 +27,10 @@ sqlplus -s / as sysdba << EOF
 EOF
 
 if [ $? != 0  ]; then
-    echo "Error: Statistics gathering could not be completed.\n\nFor more infomation,
-please see the following log:\n$logfile"
+    echo "Error: Statistics gathering could not be completed.\n\n$(cat $logfile | grep -e ORA- -e SP2- )\n\nFor more infomation, please see the following log:\n$logfile"
     exit 2;
 else
     echo "Statistics gathering has been successfully completed."
-    rm $logfile
 fi
 
 

@@ -17,8 +17,7 @@ STOP=`sqlplus -s / as sysdba << EOF
 EOF`
 
 if [ $? != 0  ]; then
-    echo "Error: Oracle could not shut down.\n\nFor more infomation,
-please see the following log:\n$logfile"
+    echo "Error: Oracle could not shut down.\n\n$(cat $logfile | grep -e ORA- -e SP2- )\n\nFor more infomation, please see the following log:\n$logfile"
     exit 2;
 else
     echo "$STOP"

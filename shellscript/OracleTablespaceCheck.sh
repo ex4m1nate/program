@@ -2,6 +2,7 @@
 
 logname="7_OracleTablespaceCheck_$(date +'%Y%m%d_%H%M%S').log"
 logfile="/tmp/job/$logname"
+error=$(cat $logfile | grep -Eic "ORA-[0-9]+SP2-[0-9]+" )
 
 SQL="set feedback off;
 set echo off;
@@ -49,7 +50,8 @@ RESULT=`sqlplus -s / as sysdba << EOF
 EOF`
 
 if [ $? != 0  ]; then
-    echo "Error: Oracle could not check tablespaces.\n\nFor more infomation,
+    echo "Error: Oracle could not check tablespaces.\n\n$(cat $logfile | grep
+ -e ORA- -e SP2- )\n\nFor more infomation,
 please see the following log:\n$logfile"
     exit 2;
 else
