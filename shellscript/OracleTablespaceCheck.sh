@@ -1,11 +1,15 @@
 #!/bin/sh
 
+logname="7_OracleTablespaceCheck_$(date +'%Y%m%d_%H%M%S').log"
+logfile="/tmp/job/$logname"
+
 SQL="set feedback off;
 set echo off;
 set flush off;
 set head on;
 alter session set container = pdb;
-whenever sqlerror exit 2;
+whenever sqlerror exit sql.sqlcode;
+spool $logfile
 col tablespace_name     format a15
 col size_MB           format 990.99
 col used_MB           format 990.99
@@ -35,16 +39,21 @@ from
   )
 where
   tablespace_name = free_tablespace_name(+)
-/"
+/
+spool off;
+exit;
+"
 
 RESULT=`sqlplus -s / as sysdba << EOF
     $SQL
 EOF`
 
 if [ $? != 0  ]; then
+    echo "Error: Oracle could not check tablespaces.\n\nFor more infomation,
+please see the following log:\n$logfile"
     exit 2;
+else
+    echo "$RESULT"
 fi
-
-echo "$RESULT"
 
 exit 0;
