@@ -1,6 +1,6 @@
 #!/bin/sh
 
-logname="3_OracleDatabaseStart_$(date +'%Y%m%d_%H%M%S').log"
+logname="3_OracleDatabaseStart.log"
 logfile="/tmp/job/$logname"
 
 START=`sqlplus -s / as sysdba << EOF

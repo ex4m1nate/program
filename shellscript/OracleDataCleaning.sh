@@ -1,6 +1,6 @@
 #!/bin/sh
 
-logname="8_OracleDataCleaning_$(date +'%Y%m%d_%H%M%S').log"
+logname="8_OracleDataCleaning.log"
 logfile="/tmp/job/$logname"
 limit=1000
 

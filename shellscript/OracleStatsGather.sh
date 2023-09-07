@@ -1,6 +1,6 @@
 #!/bin/sh
 
-logname="6_OracleStatsGather_$(date +'%Y%m%d_%H%M%S').log"
+logname="6_OracleStatsGather.log"
 logfile="/tmp/job/$logname"
 
 SQL="set feedback off;

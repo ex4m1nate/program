@@ -1,6 +1,6 @@
 #!/bin/sh
 
-logname="2_OracleDatabaseStop_$(date +'%Y%m%d_%H%M%S').log"
+logname="2_OracleDatabaseStop.log"
 logfile="/tmp/job/$logname"
 
 STOP=`sqlplus -s / as sysdba << EOF

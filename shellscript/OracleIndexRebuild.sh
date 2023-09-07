@@ -1,6 +1,6 @@
 #!/bin/sh
 
-logname="5_OracleIndexRebuild_$(date +'%Y%m%d_%H%M%S').log"
+logname="5_OracleIndexRebuild.log"
 logfile="/tmp/job/$logname"
 
 
