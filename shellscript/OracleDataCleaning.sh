@@ -31,7 +31,7 @@ EOF
 
 
 if [ $? != 0  ]; then
-    echo "Error: Data cleaning could not be completed.n\n$(cat $logfile | grep -e ORA- -e SP2- )\n\nFor more infomation, please see the following log:\n$logfile"
+    echo "Error: Data cleaning could not be completed.\n\n$(cat $logfile | grep -e ORA- -e SP2- )\n\nFor more infomation, please see the following log:\n$logfile"
     exit 2;
 else
     echo "Data cleaning was successfully completed."
