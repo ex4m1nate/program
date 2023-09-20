@@ -26,7 +26,7 @@ cat << EOF | sqlplus -S -M 'CSV ON' fum/password@pdb > $ffu_csvfile
     fum.fum_log log
     inner join fum.fum_actiontype_primarytype ap on fum.log.primary_type = ap.primary_type
   where
-    substr(log.update_date, 1, 10) = to_char(sysdate - 4, 'yyyy-mm-dd')
+    substr(log.update_date, 1, 10) = to_char(sysdate - 1, 'yyyy-mm-dd')
   order by
     log.update_date;
   spool off;
@@ -59,7 +59,7 @@ cat << EOF | sqlplus -S -M 'CSV ON' ofac1/ofac@pdb > $fcvw_csvfile
     , ofac1.fmf_users user_tbl
   where
     main_tbl.actor = user_tbl.t_id
-    and to_char(main_tbl.event_time, 'yyyymmdd') = to_char(sysdate - 4, 'yyyymmdd')
+    and to_char(main_tbl.event_time, 'yyyymmdd') = to_char(sysdate - 1, 'yyyymmdd')
   order by
     event_time asc;
   spool off;
