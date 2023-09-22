@@ -1,7 +1,20 @@
-#!/bin/sh
+#!/bin/ksh
 
-logname="7_OracleTablespaceCheck_$(date +'%Y%m%d_%H%M%S').log"
-logfile="/tmp/job/$logname"
+. /opt/cbj_com/set_param.env
+. /opt/cbj_com/common_function.ksh
+
+PGR_NAME=`echo $0 | awk -F/ '{print $NF}' 2> /dev/null`
+    
+convertDate
+LOG_DATE=$ret
+   
+convertMsg "001"
+LOG_MSG=$ret
+MSG_CD=`echo ${LOG_MSG} | awk -F: '{print $1}'`
+LOG_MSG=`echo ${LOG_MSG} | awk -F: '{print $2}'`
+    
+writeLog "${LOG_DATE}" "${MSG_CD}" "${LOG_MSG}" "${PGR_NAME}"
+
 
 SQL="set feedback off;
 set echo off;
@@ -9,7 +22,6 @@ set flush off;
 set head on;
 alter session set container = pdb;
 whenever sqlerror exit sql.sqlcode;
-spool $logfile
 col tablespace_name     format a15
 col size_MB           format 990.99
 col used_MB           format 990.99
@@ -40,7 +52,6 @@ from
 where
   tablespace_name = free_tablespace_name(+)
 /
-spool off;
 exit;
 "
 
@@ -49,9 +60,29 @@ RESULT=`sqlplus -s / as sysdba << EOF
 EOF`
 
 if [ $? != 0  ]; then
-    echo "Error: Oracle could not check tablespaces.\n\n$(cat $logfile | grep -e ORA- -e SP2- )\n\nFor more infomation, please see the following log:\n$logfile"
+    convertDate
+    LOG_DATE=$ret
+    
+    convertMsg "003"
+    LOG_MSG=$ret
+    MSG_CD=`echo ${LOG_MSG} | awk -F: '{print $1}'`
+    LOG_MSG=`echo ${LOG_MSG} | awk -F: '{print $2}'`
+    
+    writeLog "${LOG_DATE}" "${MSG_CD}" "${LOG_MSG}" "${PGR_NAME}"
+    
+    echo "Error: Oracle could not check tablespaces.\n\n$RESULT"
     exit 2;
 else
+    convertDate
+    LOG_DATE=$ret
+
+    convertMsg "002"
+    LOG_MSG=$ret
+    MSG_CD=`echo ${LOG_MSG} | awk -F: '{print $1}'`
+    LOG_MSG=`echo ${LOG_MSG} | awk -F: '{print $2}'`
+
+    writeLog "${LOG_DATE}" "${MSG_CD}" "${LOG_MSG}" "${PGR_NAME}"
+
     echo "$RESULT"
 fi
 

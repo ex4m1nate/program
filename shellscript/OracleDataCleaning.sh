@@ -1,8 +1,21 @@
-#!/bin/sh
+#!/bin/ksh
 
-logname="8_OracleDataCleaning.log"
-logfile="/tmp/job/$logname"
-limit=1000
+. /opt/cbj_com/set_param.env
+. /opt/cbj_com/common_function.ksh
+
+PGR_NAME=`echo $0 | awk -F/ '{print $NF}' 2> /dev/null`
+    
+convertDate
+LOG_DATE=$ret
+   
+convertMsg "001"
+LOG_MSG=$ret
+MSG_CD=`echo ${LOG_MSG} | awk -F: '{print $1}'`
+LOG_MSG=`echo ${LOG_MSG} | awk -F: '{print $2}'`
+    
+writeLog "${LOG_DATE}" "${MSG_CD}" "${LOG_MSG}" "${PGR_NAME}"
+
+limit=28
 
 SQL="set feedback off;
 set echo off;
@@ -11,7 +24,6 @@ set head off;
 alter session set container = pdb;
 alter session set nls_date_format='YYYY-MM-DD HH24:MI:SS';
 whenever sqlerror exit sql.sqlcode;
-spool $logfile;
 declare
     reference_date date;
 begin
@@ -21,19 +33,38 @@ begin
     commit;
 end;
 /
-spool off;
 exit;
 "
 
-sqlplus -s / as sysdba << EOF
+RESULT=`sqlplus -s / as sysdba << EOF
     $SQL
-EOF
+EOF`
 
 
 if [ $? != 0  ]; then
-    echo "Error: Data cleaning could not be completed.\n\n$(cat $logfile | grep -e ORA- -e SP2- )\n\nFor more infomation, please see the following log:\n$logfile"
+    convertDate
+    LOG_DATE=$ret
+   
+    convertMsg "003"
+    LOG_MSG=$ret
+    MSG_CD=`echo ${LOG_MSG} | awk -F: '{print $1}'`
+    LOG_MSG=`echo ${LOG_MSG} | awk -F: '{print $2}'`
+    
+    writeLog "${LOG_DATE}" "${MSG_CD}" "${LOG_MSG}" "${PGR_NAME}"
+    
+    echo "Error: Data cleaning could not be completed.\n\n$RESULT"
     exit 2;
 else
+    convertDate
+    LOG_DATE=$ret
+   
+    convertMsg "002"
+    LOG_MSG=$ret
+    MSG_CD=`echo ${LOG_MSG} | awk -F: '{print $1}'`
+    LOG_MSG=`echo ${LOG_MSG} | awk -F: '{print $2}'`
+    
+    writeLog "${LOG_DATE}" "${MSG_CD}" "${LOG_MSG}" "${PGR_NAME}"
+
     echo "Data cleaning was successfully completed."
 fi
 
