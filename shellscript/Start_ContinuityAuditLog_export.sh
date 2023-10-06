@@ -15,25 +15,29 @@ LOG_MSG=`echo ${LOG_MSG} | awk -F: '{print $2}'`
     
 writeLog "${LOG_DATE}" "${MSG_CD}" "${LOG_MSG}" "${PGR_NAME}"
 
-SQL="set feedback off;
-set echo off;
-set flush off;
-set head off;
-alter session set container = pdb;
-whenever sqlerror exit sql.sqlcode;
-exec dbms_stats.gather_schema_stats(ownname => 'FUM', estimate_percent => dbm
-s_stats.auto_sample_size);
-exec dbms_stats.gather_schema_stats(ownname => 'FMM', estimate_percent => dbm
-s_stats.auto_sample_size);
-exec dbms_stats.gather_schema_stats(ownname => 'FML', estimate_percent => dbm
-s_stats.auto_sample_size);
-exec dbms_stats.gather_schema_stats(ownname => 'OFAC', estimate_percent =>db
-ms_stats.auto_sample_size);
-exit;
-"
+fcvw_csvfile="/tmp/firco_app_log.csv"
 
-RESULT=`sqlplus -s / as sysdba << EOF
-    $SQL
+RESULT=`cat << EOF | sqlplus -S -M 'CSV ON' ofac/ofac@pdb > $fcvw_csvfile
+  set feedback off;
+  set echo off;
+  set flush off;
+  set head on;
+  alter session set nls_date_format='yyyy-mm-dd hh24:mi:ss';
+  whenever sqlerror exit sql.sqlcode;
+  select
+    user_tbl.t_login as username
+    , to_char(main_tbl.event_time, 'yyyy-mm-dd hh24:mi:ss') as event_time
+    , main_tbl.activity
+    , main_tbl.description
+  from
+    ofac.firco_app_log main_tbl
+    , ofac.fmf_users user_tbl
+  where
+    main_tbl.actor = user_tbl.t_id
+    and to_char(main_tbl.event_time, 'yyyymmdd') = to_char(sysdate - 1, 'yyyymmdd')
+  order by
+    event_time asc;
+  exit;
 EOF`
 
 if [ $? != 0  ]; then
@@ -46,8 +50,8 @@ if [ $? != 0  ]; then
     LOG_MSG=`echo ${LOG_MSG} | awk -F: '{print $2}'`
     
     writeLog "${LOG_DATE}" "${MSG_CD}" "${LOG_MSG}" "${PGR_NAME}"
-    
-    echo "Error: Statistics gathering could not be completed.\n\n$RESULT"
+
+    echo "Error: Could not output the CSV file.\n\n$RESULT"
     exit 2;
 else
     convertDate
@@ -59,7 +63,8 @@ else
     LOG_MSG=`echo ${LOG_MSG} | awk -F: '{print $2}'`
     
     writeLog "${LOG_DATE}" "${MSG_CD}" "${LOG_MSG}" "${PGR_NAME}"
-    echo "Statistics gathering has been successfully completed."
+
+    echo "The CSV file was successfully output.\n\nPlease see the following file: $fcvw_csvfile"
 fi
 
 

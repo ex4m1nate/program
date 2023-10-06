@@ -15,22 +15,42 @@ LOG_MSG=`echo ${LOG_MSG} | awk -F: '{print $2}'`
     
 writeLog "${LOG_DATE}" "${MSG_CD}" "${LOG_MSG}" "${PGR_NAME}"
 
+limit=28
+
 SQL="set feedback off;
 set echo off;
 set flush off;
 set head off;
 alter session set container = pdb;
+alter session set nls_date_format='yyyy-mm-dd hh24:mi:ss';
 whenever sqlerror exit sql.sqlcode;
-exec dbms_stats.gather_schema_stats(ownname => 'FUM', estimate_percent => dbm
-s_stats.auto_sample_size);
-exec dbms_stats.gather_schema_stats(ownname => 'FMM', estimate_percent => dbm
-s_stats.auto_sample_size);
-exec dbms_stats.gather_schema_stats(ownname => 'FML', estimate_percent => dbm
-s_stats.auto_sample_size);
-exec dbms_stats.gather_schema_stats(ownname => 'OFAC', estimate_percent =>db
-ms_stats.auto_sample_size);
+declare
+    reference_date date;
+begin
+    reference_date := to_date(to_char(sysdate - $limit, 'yyyy-mm-dd hh24:mi:ss'), 'yyyy-mm-dd hh24:mi:ss');
+    delete
+        from
+            ofac.firco_app_log
+        where
+            to_date(ofac.firco_app_log.event_time, 'yyyy-mm-dd hh24:mi:ss') < reference_date;
+    delete
+        from
+            ofac.fmf_users user_tbl
+        where
+            user_tbl.t_id in (
+                select main_tbl.actor
+                from ofac.firco_app_log main_tbl
+                where to_date(main_tbl.event_time, 'yyyy-mm-dd hh24:mi:ss') < reference_date
+            );
+    commit;
+end;
+/
 exit;
 "
+
+sqlplus -s / as sysdba << EOF
+    $SQL
+EOF
 
 RESULT=`sqlplus -s / as sysdba << EOF
     $SQL
@@ -47,7 +67,7 @@ if [ $? != 0  ]; then
     
     writeLog "${LOG_DATE}" "${MSG_CD}" "${LOG_MSG}" "${PGR_NAME}"
     
-    echo "Error: Statistics gathering could not be completed.\n\n$RESULT"
+    echo "Error: Data cleaning could not be completed.\n\n$RESULT"
     exit 2;
 else
     convertDate
@@ -59,8 +79,8 @@ else
     LOG_MSG=`echo ${LOG_MSG} | awk -F: '{print $2}'`
     
     writeLog "${LOG_DATE}" "${MSG_CD}" "${LOG_MSG}" "${PGR_NAME}"
-    echo "Statistics gathering has been successfully completed."
-fi
 
+    echo "Data cleaning was successfully completed."
+fi
 
 exit 0;
