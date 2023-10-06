@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/sh
 
 . /opt/cbj_com/set_param.env
 . /opt/cbj_com/common_function.ksh
