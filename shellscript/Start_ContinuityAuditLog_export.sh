@@ -16,6 +16,7 @@ LOG_MSG=`echo ${LOG_MSG} | awk -F: '{print $2}'`
 writeLog "${LOG_DATE}" "${MSG_CD}" "${LOG_MSG}" "${PGR_NAME}"
 
 fcvw_csvfile="/tmp/firco_app_log.csv"
+export_date=1
 
 RESULT=`cat << EOF | sqlplus -S -M 'CSV ON' ofac/ofac@pdb > $fcvw_csvfile
   set feedback off;
@@ -34,7 +35,7 @@ RESULT=`cat << EOF | sqlplus -S -M 'CSV ON' ofac/ofac@pdb > $fcvw_csvfile
     , ofac.fmf_users user_tbl
   where
     main_tbl.actor = user_tbl.t_id
-    and to_char(main_tbl.event_time, 'yyyymmdd') = to_char(sysdate - 1, 'yyyymmdd')
+    and to_char(main_tbl.event_time, 'yyyymmdd') = to_char(sysdate - $export_date, 'yyyymmdd')
   order by
     event_time asc;
   exit;
