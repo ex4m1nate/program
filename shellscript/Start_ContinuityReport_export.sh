@@ -26,16 +26,11 @@ RESULT=`cat << EOF | sqlplus -S -M 'CSV ON' ofac/ofac@pdb > $fcvw_csvfile
   alter session set nls_date_format='yyyy-mm-dd hh24:mi:ss';
   whenever sqlerror exit sql.sqlcode;
   select
+    *
   from
     ofac.firco_cty_report
-    , ofac.firco_cty_report_unit
   where
-    report_id 
-    in (
-      select id 
-      from fcvw.firco_cty_report 
-      where to_char(firco_cty_report.generated, 'yyyymmdd') = to_char(sysdate - $export_date, 'yyyymmdd')
-    )
+    to_char(firco_cty_report.generated, 'yyyymmdd') = to_char(sysdate - $export_date, 'yyyymmdd')
   order by
     generated asc;
   exit;
