@@ -14,6 +14,7 @@
     "@azure/openai": "^2.0.0-beta.1",
     "axios": "^1.7.3",
     "dotenv": "^16.4.5",
+    "fs.promises": "^0.1.2",
     "kuromoji": "^0.1.2",
     "openai": "^4.55.0"
   }

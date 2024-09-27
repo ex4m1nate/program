@@ -3,8 +3,8 @@ const kuromoji = require('kuromoji');
 const axios = require('axios');
 
 const INPUT_FILE = 'input.vtt';
-const OUTPUT_FILE = 'output.vtt'
-const OUTPUT_FILE_SUM = 'gijiroku.md'
+const OUTPUT_FILE = 'output.vtt';
+const OUTPUT_FILE_SUM = 'gijiroku.md';
 
 // チャンク分割時のトークン数
 const CHUNK_TOKEN_LIMIT = 1900;
@@ -40,19 +40,12 @@ function readVttFile(file) {
   });
 }
 
-function cleanText(text) {
-  if (typeof text !== 'string') return '';
-  return text.replace(/\s+/g, ' ').trim();
-}
-
 /**********************************************
  *  OpenAI APIで要約や議事録作成を行う関数
  **********************************************/
 async function useOpenAi(prompt,chunk) {
-  chunk = cleanText(chunk);
 
-  const input_prompt = `${prompt}
-  ${chunk}`;
+  const input_prompt = `${prompt}\n${chunk}`;
 
   const uri = OPENAI_API_ENDPOINT;
   const header = {
@@ -65,7 +58,7 @@ async function useOpenAi(prompt,chunk) {
     top_p: 0.95,
     frequency_penalty: 0,
     presence_penalty: 0,
-    stop: ['##'],
+    stop: ['##'+'\n'],
     messages: [
       {
         role: 'user',
@@ -159,7 +152,8 @@ async function splitAndSummarizeVttFile(vttContent) {
     console.log(summaries);
 
     // まとめた要約をファイルに出力する
-    fs.writeFile(OUTPUT_FILE, summaries, 'utf8', (err) => {
+    const summaries_out = summaries
+    fs.writeFile(OUTPUT_FILE, summaries_out, 'utf8', (err) => {
       if (err) {
           console.error('Error writing summaries to file:', err.message);
       } else {
@@ -168,7 +162,7 @@ async function splitAndSummarizeVttFile(vttContent) {
     });
 
     // まとめた要約から議事録を作成してファイルに出力する
-    giji = await useOpenAi(GIJIROKU_PROMPT,summaries);
+    const giji = await useOpenAi(GIJIROKU_PROMPT,summaries);
     fs.writeFile(OUTPUT_FILE_SUM, giji, 'utf8', (err) => {
       if (err) {
           console.error('Error writing summaries to file:', err.message);
@@ -176,7 +170,6 @@ async function splitAndSummarizeVttFile(vttContent) {
           console.log(`Summaries written to ${OUTPUT_FILE_SUM}`);
       }
     });
-    isCompleted = true;
 
   } catch (err) {
     console.error('Error:', err.message);
